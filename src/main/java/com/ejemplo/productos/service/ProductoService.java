@@ -2,9 +2,10 @@ package com.ejemplo.productos.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.ejemplo.productos.exception.ProductoNoEncontradoException;
 import com.ejemplo.productos.model.Producto;
 import com.ejemplo.productos.repository.ProductoRepository;
 
@@ -19,27 +20,32 @@ public class ProductoService {
 
     public Producto crear(Producto producto) {
         producto.setId(null);
-        return repository.guardar(producto);
+        return repository.save(producto);
     }
 
     public List<Producto> listar() {
-        return repository.buscarTodos();
+        return repository.findAll();
     }
 
-    public Producto buscarPorId(String id) {
-        return repository.buscarPorId(id)
-                .orElseThrow(() ->
-                        new ProductoNoEncontradoException(id));
+    public Producto buscarPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Producto no encontrado con id: " + id));
     }
 
-    public Producto actualizar(String id, Producto producto) {
-        buscarPorId(id);
-        producto.setId(id);
-        return repository.actualizar(id, producto);
+    public Producto actualizar(Long id, Producto datos) {
+        Producto producto = buscarPorId(id);
+
+        producto.setNombre(datos.getNombre());
+        producto.setDescripcion(datos.getDescripcion());
+        producto.setPrecio(datos.getPrecio());
+
+        return repository.save(producto);
     }
 
-    public void eliminar(String id) {
-        buscarPorId(id);
-        repository.eliminar(id);
+    public void eliminar(Long id) {
+        Producto producto = buscarPorId(id);
+        repository.delete(producto);
     }
 }

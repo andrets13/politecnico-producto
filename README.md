@@ -1,738 +1,142 @@
-\# CRUD de Productos con Spring Boot y Firebase
+# CRUD de Productos con Spring Boot y SQL Server
 
+API REST para administrar productos mediante operaciones CRUD. La persistencia se realiza en SQL Server utilizando Spring Data JPA e Hibernate como ORM.
 
+## Tecnologías
 
-!\[Java](https://img.shields.io/badge/Java-21-orange)
+- Java 21
+- Spring Boot
+- Spring Web
+- Spring Data JPA
+- Hibernate
+- SQL Server
+- Maven
+- Eclipse IDE
 
-!\[Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.16-brightgreen)
+## Funcionalidades
 
-!\[Firebase](https://img.shields.io/badge/Firebase-Firestore-yellow)
+- Crear productos
+- Listar productos
+- Consultar un producto por ID
+- Actualizar productos
+- Eliminar productos
+- Validar nombre, descripción y precio
+- Generar automáticamente la tabla mediante Hibernate
 
-!\[API REST](https://img.shields.io/badge/API-REST-blue)
+## Requisitos
 
+- Java 21
+- SQL Server disponible en el puerto `1433`
+- Maven o Maven Wrapper
+- Eclipse IDE o un editor compatible con Maven
 
+## Base de datos
 
-API REST para gestionar productos mediante operaciones de creación, consulta, actualización y eliminación. La aplicación fue desarrollada con Spring Boot y utiliza Firebase Cloud Firestore como base de datos NoSQL.
+Ingresar a SQL Server con un usuario administrador y ejecutar:
 
+```sql
+USE master;
+GO
 
+CREATE DATABASE poli;
+GO
 
-\## Tecnologías
+CREATE LOGIN poli
+WITH PASSWORD = '1234',
+CHECK_POLICY = OFF;
+GO
 
+USE poli;
+GO
 
+CREATE USER poli FOR LOGIN poli;
+GO
 
-\* Java 21
+ALTER ROLE db_owner ADD MEMBER poli;
+GO
+```
 
-\* Spring Boot 3.5.16
+No es necesario crear manualmente la tabla `productos`. Hibernate la genera automáticamente al iniciar la aplicación.
 
-\* Maven Wrapper
+## Configuración
 
-\* Firebase Admin SDK
-
-\* Cloud Firestore
-
-\* Jakarta Validation
-
-\* Postman
-
-\* Eclipse IDE
-
-
-
-\## Estructura del proyecto
-
-
+La conexión está definida en:
 
 ```text
-
-src/main/java/com/ejemplo/productos
-
-├── config
-
-├── controller
-
-├── exception
-
-├── model
-
-├── repository
-
-├── service
-
-└── ProductosApplication.java
-
+src/main/resources/application.properties
 ```
 
+```properties
+spring.application.name=productos
+server.port=8081
 
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=poli;encrypt=true;trustServerCertificate=true
+spring.datasource.username=poli
+spring.datasource.password=1234
+spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
 
-| Paquete      | Responsabilidad           |
-
-| ------------ | ------------------------- |
-
-| `config`     | Configuración de Firebase |
-
-| `controller` | Endpoints de la API REST  |
-
-| `exception`  | Manejo de errores         |
-
-| `model`      | Modelo Producto           |
-
-| `repository` | Acceso a Firestore        |
-
-| `service`    | Lógica de negocio         |
-
-
-
-\## Modelo Producto
-
-
-
-```json
-
-{
-
-&#x20; "id": "ID\_GENERADO\_POR\_FIREBASE",
-
-&#x20; "nombre": "Libro de matematicas",
-
-&#x20; "descripcion": "Libro de matematicas grado 6",
-
-&#x20; "precio": 55000
-
-}
-
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.open-in-view=false
 ```
 
-
-
-La colección utilizada en Firestore se llama:
-
-
-
-```text
-
-producto
-
-```
-
-
-
-\## Requisitos
-
-
-
-\* Java JDK 21.
-
-\* Git.
-
-\* Conexión a Internet.
-
-\* Archivo `firebase-productos.json`.
-
-\* Puerto 8080 disponible.
-
-\* Postman para probar la API.
-
-
-
-No es necesario instalar Maven porque el proyecto incluye Maven Wrapper.
-
-
-
-\## Descargar el proyecto
-
-
-
-Desde PowerShell:
-
-
+## Descargar y ejecutar
 
 ```powershell
-
 git clone https://github.com/andrets13/politecnico-producto.git
-
-cd ".\\politecnico-producto"
-
+cd politecnico-producto
+.\mvnw.cmd spring-boot:run
 ```
 
-
-
-\## Configurar la credencial de Firebase
-
-
-
-El archivo `firebase-productos.json` se entrega por separado.
-
-
-
-Cree la carpeta:
-
-
-
-```powershell
-
-New-Item -ItemType Directory -Force "C:\\credenciales"
-
-```
-
-
-
-Guarde el archivo recibido en:
-
-
+También puede importarse en Eclipse como un proyecto Maven y ejecutar:
 
 ```text
-
-C:\\credenciales\\firebase-productos.json
-
+ProductosApplication.java
+→ Run As
+→ Spring Boot App
 ```
 
-
-
-La estructura debe quedar:
-
-
+La aplicación estará disponible en:
 
 ```text
-
-C:\\credenciales
-
-└── firebase-productos.json
-
+http://localhost:8081
 ```
 
-
-
-Configure la variable de entorno:
-
-
-
-```powershell
-
-$env:GOOGLE\_APPLICATION\_CREDENTIALS = "C:\\credenciales\\firebase-productos.json"
-
-```
-
-
-
-Verifique la configuración:
-
-
-
-```powershell
-
-$env:GOOGLE\_APPLICATION\_CREDENTIALS
-
-```
-
-
-
-\## Ejecutar desde PowerShell
-
-
-
-Ubíquese en el proyecto:
-
-
-
-```powershell
-
-cd "RUTA\\politecnico-producto"
-
-```
-
-
-
-Configure la credencial si todavía no lo ha hecho:
-
-
-
-```powershell
-
-$env:GOOGLE\_APPLICATION\_CREDENTIALS = "C:\\credenciales\\firebase-productos.json"
-
-```
-
-
-
-Ejecute la aplicación:
-
-
-
-```powershell
-
-.\\mvnw.cmd clean spring-boot:run
-
-```
-
-
-
-La aplicación estará disponible cuando aparezca:
-
-
-
-```text
-
-Tomcat started on port 8080
-
-Started ProductosApplication
-
-```
-
-
-
-URL principal:
-
-
-
-```text
-
-http://localhost:8080/api/productos
-
-```
-
-
-
-\## Ejecutar desde Eclipse
-
-
-
-\### Importar el proyecto
-
-
-
-1\. Abra Eclipse.
-
-2\. Seleccione `File > Import`.
-
-3\. Seleccione `Maven > Existing Maven Projects`.
-
-4\. Seleccione la carpeta `politecnico-producto`.
-
-5\. Presione `Finish`.
-
-6\. Espere la descarga de las dependencias.
-
-7\. Clic derecho sobre el proyecto.
-
-8\. Seleccione `Maven > Update Project`.
-
-9\. Marque `Force Update of Snapshots/Releases`.
-
-10\. Presione `OK`.
-
-
-
-\### Configurar la credencial
-
-
-
-1\. Seleccione `Run > Run Configurations`.
-
-2\. Abra `Spring Boot App`.
-
-3\. Seleccione el proyecto.
-
-4\. Abra la pestaña `Environment`.
-
-5\. Presione `Add`.
-
-6\. Configure:
-
-
-
-```text
-
-Name:
-
-GOOGLE\_APPLICATION\_CREDENTIALS
-
-```
-
-
-
-```text
-
-Value:
-
-C:\\credenciales\\firebase-productos.json
-
-```
-
-
-
-7\. Presione `Apply`.
-
-8\. Presione `Run`.
-
-
-
-También puede ejecutar la clase:
-
-
-
-```text
-
-com.ejemplo.productos.ProductosApplication
-
-```
-
-
-
-mediante:
-
-
-
-```text
-
-Run As > Spring Boot App
-
-```
-
-
-
-\## Endpoints
-
-
-
-| Método | Endpoint              | Operación           | Código esperado  |
-
-| ------ | --------------------- | ------------------- | ---------------- |
-
-| GET    | `/api/productos`      | Listar productos    | `200 OK`         |
-
-| GET    | `/api/productos/{id}` | Consultar por ID    | `200 OK`         |
-
-| POST   | `/api/productos`      | Crear producto      | `201 Created`    |
-
-| PUT    | `/api/productos/{id}` | Actualizar producto | `200 OK`         |
-
-| DELETE | `/api/productos/{id}` | Eliminar producto   | `204 No Content` |
-
-
-
-\## Pruebas con Postman
-
-
-
-\### Listar productos
-
-
+## Endpoints
+
+| Operación | Método | URL |
+|---|---|---|
+| Listar | GET | `/api/productos` |
+| Consultar | GET | `/api/productos/{id}` |
+| Crear | POST | `/api/productos` |
+| Actualizar | PUT | `/api/productos/{id}` |
+| Eliminar | DELETE | `/api/productos/{id}` |
+
+## Ejemplo para crear un producto
 
 ```http
-
-GET http://localhost:8080/api/productos
-
-```
-
-
-
-\### Consultar por ID
-
-
-
-```http
-
-GET http://localhost:8080/api/productos/ID\_DEL\_PRODUCTO
-
-```
-
-
-
-\### Crear producto
-
-
-
-```http
-
-POST http://localhost:8080/api/productos
-
+POST http://localhost:8081/api/productos
 Content-Type: application/json
-
 ```
 
-
-
 ```json
-
 {
-
-&#x20; "nombre": "Mouse inalámbrico",
-
-&#x20; "descripcion": "Mouse ergonómico con conexión Bluetooth",
-
-&#x20; "precio": 85000
-
+  "nombre": "Libro de matemáticas",
+  "descripcion": "Libro de matemáticas grado 6",
+  "precio": 55000.00
 }
-
 ```
 
+El campo `id` es generado automáticamente por SQL Server.
 
+## Modelo generado por Hibernate
 
-\### Actualizar producto
+La entidad `Producto` genera una tabla con la siguiente estructura:
 
-
-
-```http
-
-PUT http://localhost:8080/api/productos/ID\_DEL\_PRODUCTO
-
-Content-Type: application/json
-
-```
-
-
-
-```json
-
-{
-
-&#x20; "nombre": "Mouse actualizado",
-
-&#x20; "descripcion": "Mouse recargable con conexión Bluetooth",
-
-&#x20; "precio": 99000
-
-}
-
-```
-
-
-
-\### Eliminar producto
-
-
-
-```http
-
-DELETE http://localhost:8080/api/productos/ID\_DEL\_PRODUCTO
-
-```
-
-
-
-La respuesta esperada es:
-
-
-
-```text
-
-204 No Content
-
-```
-
-
-
-Es normal que la respuesta no tenga contenido.
-
-
-
-\## Validaciones
-
-
-
-\* `nombre` es obligatorio.
-
-\* `descripcion` es obligatoria.
-
-\* `precio` es obligatorio.
-
-\* `precio` debe ser mayor que cero.
-
-
-
-Ejemplo inválido:
-
-
-
-```json
-
-{
-
-&#x20; "nombre": "",
-
-&#x20; "descripcion": "",
-
-&#x20; "precio": 0
-
-}
-
-```
-
-
-
-Respuesta esperada:
-
-
-
-```text
-
-400 Bad Request
-
-```
-
-
-
-\## Problemas frecuentes
-
-
-
-\### Credenciales no encontradas
-
-
-
-Si aparece:
-
-
-
-```text
-
-Your default credentials were not found
-
-```
-
-
-
-Ejecute:
-
-
-
-```powershell
-
-$env:GOOGLE\_APPLICATION\_CREDENTIALS = "C:\\credenciales\\firebase-productos.json"
-
-```
-
-
-
-Compruebe también que el archivo exista:
-
-
-
-```powershell
-
-Test-Path "C:\\credenciales\\firebase-productos.json"
-
-```
-
-
-
-El resultado debe ser:
-
-
-
-```text
-
-True
-
-```
-
-
-
-\### El GET devuelve una lista vacía
-
-
-
-Si la respuesta es:
-
-
-
-```json
-
-\[]
-
-```
-
-
-
-Verifique:
-
-
-
-\* Que la credencial pertenezca al proyecto correcto.
-
-\* Que la colección se llame exactamente `producto`.
-
-\* Que existan documentos en Firestore.
-
-\* Que los campos se llamen `nombre`, `descripcion` y `precio`.
-
-
-
-\### Puerto 8080 ocupado
-
-
-
-Ejecute temporalmente en otro puerto:
-
-
-
-```powershell
-
-.\\mvnw.cmd spring-boot:run `
-
-"-Dspring-boot.run.arguments=--server.port=8081"
-
-```
-
-
-
-Nueva URL:
-
-
-
-```text
-
-http://localhost:8081/api/productos
-
-```
-
-
-
-\## Detener la aplicación
-
-
-
-En PowerShell:
-
-
-
-```text
-
-Ctrl + C
-
-```
-
-
-
-En Eclipse presione el botón rojo `Terminate`.
-
-
-
-\## Repositorio
-
-
-
-```text
-
-https://github.com/andrets13/politecnico-producto
-
-```
-
-
-
-\## Autor
-
-
-
-```text
-
-andrets13
-
-```
-
-
-
-Proyecto desarrollado como actividad académica para implementar servicios RESTful y operaciones CRUD utilizando un framework backend y una base de datos en la nube.
-
-
-
+| Campo | Tipo aproximado en SQL Server |
+|---|---|
+| `id` | `bigint identity` |
+| `nombre` | `nvarchar(100)` |
+| `descripcion` | `nvarchar(500)` |
+| `precio` | `decimal(18,2)` |
