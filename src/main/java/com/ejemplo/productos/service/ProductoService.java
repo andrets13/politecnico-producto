@@ -2,50 +2,53 @@ package com.ejemplo.productos.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.ejemplo.productos.exception.ProductoNoEncontradoException;
 import com.ejemplo.productos.model.Producto;
 import com.ejemplo.productos.repository.ProductoRepository;
 
 @Service
 public class ProductoService {
 
-    private final ProductoRepository repository;
+    private final ProductoRepository productoRepository;
 
-    public ProductoService(ProductoRepository repository) {
-        this.repository = repository;
+    public ProductoService(ProductoRepository productoRepository) {
+        this.productoRepository = productoRepository;
     }
+
+
+    public List<Producto> listar() {
+        return productoRepository.findAll();
+    }
+
+
+    public Producto obtenerPorId(Long id) {
+        return productoRepository.findById(id)
+                .orElseThrow(() ->
+                        new ProductoNoEncontradoException(id));
+    }
+
 
     public Producto crear(Producto producto) {
         producto.setId(null);
-        return repository.save(producto);
+        return productoRepository.save(producto);
     }
 
-    public List<Producto> listar() {
-        return repository.findAll();
-    }
-
-    public Producto buscarPorId(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Producto no encontrado con id: " + id));
-    }
 
     public Producto actualizar(Long id, Producto datos) {
-        Producto producto = buscarPorId(id);
+        Producto productoExistente = obtenerPorId(id);
 
-        producto.setNombre(datos.getNombre());
-        producto.setDescripcion(datos.getDescripcion());
-        producto.setPrecio(datos.getPrecio());
+        productoExistente.setNombre(datos.getNombre());
+        productoExistente.setDescripcion(datos.getDescripcion());
+        productoExistente.setPrecio(datos.getPrecio());
 
-        return repository.save(producto);
+        return productoRepository.save(productoExistente);
     }
 
+
     public void eliminar(Long id) {
-        Producto producto = buscarPorId(id);
-        repository.delete(producto);
+        Producto producto = obtenerPorId(id);
+        productoRepository.delete(producto);
     }
 }

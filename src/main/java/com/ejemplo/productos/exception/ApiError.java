@@ -1,11 +1,13 @@
 package com.ejemplo.productos.exception;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.Map;
 
 public record ApiError(
-        Instant fecha,
+        OffsetDateTime fecha,
         int estado,
         String error,
-        Object detalle,
-        String ruta) {
+        String mensaje,
+        String ruta,
+        Map<String, String> detalles) {
 }

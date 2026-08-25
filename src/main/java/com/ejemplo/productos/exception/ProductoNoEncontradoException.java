@@ -2,7 +2,9 @@ package com.ejemplo.productos.exception;
 
 public class ProductoNoEncontradoException extends RuntimeException {
 
-    public ProductoNoEncontradoException(String id) {
-        super("No existe un producto con el id: " + id);
+    private static final long serialVersionUID = 1L;
+
+    public ProductoNoEncontradoException(Long id) {
+        super("No se encontró el producto con id: " + id);
     }
 }

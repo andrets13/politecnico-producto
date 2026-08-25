@@ -1,15 +1,18 @@
 package com.ejemplo.productos.exception;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -17,75 +20,111 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProductoNoEncontradoException.class)
-    public ResponseEntity<ApiError> productoNoEncontrado(
+    public ResponseEntity<ApiError> manejarProductoNoEncontrado(
             ProductoNoEncontradoException ex,
             HttpServletRequest request) {
 
-        return construir(
+        return construirRespuesta(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage(),
-                request.getRequestURI()
-        );
+                request.getRequestURI(),
+                Map.of());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> validacion(
+    public ResponseEntity<ApiError> manejarValidaciones(
             MethodArgumentNotValidException ex,
             HttpServletRequest request) {
 
-        Map<String, String> errores = new LinkedHashMap<>();
+        Map<String, String> detalles = new LinkedHashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach(error ->
-                errores.putIfAbsent(
+                detalles.putIfAbsent(
                         error.getField(),
-                        error.getDefaultMessage()
-                )
-        );
+                        error.getDefaultMessage()));
 
-        return construir(
+        return construirRespuesta(
                 HttpStatus.BAD_REQUEST,
-                errores,
-                request.getRequestURI()
-        );
+                "Los datos enviados no son válidos",
+                request.getRequestURI(),
+                detalles);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> manejarTipoInvalido(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request) {
+
+        return construirRespuesta(
+                HttpStatus.BAD_REQUEST,
+                "El parámetro '" + ex.getName()
+                        + "' tiene un valor inválido",
+                request.getRequestURI(),
+                Map.of());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiError> jsonInvalido(
+    public ResponseEntity<ApiError> manejarJsonInvalido(
             HttpMessageNotReadableException ex,
             HttpServletRequest request) {
 
-        return construir(
+        return construirRespuesta(
                 HttpStatus.BAD_REQUEST,
-                "El contenido JSON enviado no es válido",
-                request.getRequestURI()
-        );
+                "El cuerpo JSON está vacío o tiene un formato incorrecto",
+                request.getRequestURI(),
+                Map.of());
     }
 
-    @ExceptionHandler(FirebaseOperationException.class)
-    public ResponseEntity<ApiError> errorFirebase(
-            FirebaseOperationException ex,
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> manejarIntegridadDatos(
+            DataIntegrityViolationException ex,
             HttpServletRequest request) {
 
-        return construir(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ex.getMessage(),
-                request.getRequestURI()
-        );
+        return construirRespuesta(
+                HttpStatus.CONFLICT,
+                "La operación incumple una restricción de la base de datos",
+                request.getRequestURI(),
+                Map.of());
     }
 
-    private ResponseEntity<ApiError> construir(
-            HttpStatus estado,
-            Object detalle,
-            String ruta) {
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ApiError> manejarBaseDeDatos(
+            DataAccessException ex,
+            HttpServletRequest request) {
 
-        ApiError error = new ApiError(
-                Instant.now(),
+        return construirRespuesta(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "No fue posible acceder a la base de datos",
+                request.getRequestURI(),
+                Map.of());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> manejarErrorGeneral(
+            Exception ex,
+            HttpServletRequest request) {
+
+        return construirRespuesta(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Ocurrió un error interno en el servidor",
+                request.getRequestURI(),
+                Map.of());
+    }
+
+    private ResponseEntity<ApiError> construirRespuesta(
+            HttpStatus estado,
+            String mensaje,
+            String ruta,
+            Map<String, String> detalles) {
+
+        ApiError apiError = new ApiError(
+                OffsetDateTime.now(),
                 estado.value(),
                 estado.getReasonPhrase(),
-                detalle,
-                ruta
-        );
+                mensaje,
+                ruta,
+                detalles);
 
-        return ResponseEntity.status(estado).body(error);
+        return ResponseEntity.status(estado).body(apiError);
     }
 }
