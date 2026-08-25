@@ -2,7 +2,17 @@
 
 
 
-API REST desarrollada con Spring Boot para gestionar productos mediante operaciones CRUD. Los datos se almacenan en Firebase Cloud Firestore.
+!\[Java](https://img.shields.io/badge/Java-21-orange)
+
+!\[Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.16-brightgreen)
+
+!\[Firebase](https://img.shields.io/badge/Firebase-Firestore-yellow)
+
+!\[API REST](https://img.shields.io/badge/API-REST-blue)
+
+
+
+API REST para gestionar productos mediante operaciones de creación, consulta, actualización y eliminación. La aplicación fue desarrollada con Spring Boot y utiliza Firebase Cloud Firestore como base de datos NoSQL.
 
 
 
@@ -20,7 +30,55 @@ API REST desarrollada con Spring Boot para gestionar productos mediante operacio
 
 \* Cloud Firestore
 
+\* Jakarta Validation
+
 \* Postman
+
+\* Eclipse IDE
+
+
+
+\## Estructura del proyecto
+
+
+
+```text
+
+src/main/java/com/ejemplo/productos
+
+├── config
+
+├── controller
+
+├── exception
+
+├── model
+
+├── repository
+
+├── service
+
+└── ProductosApplication.java
+
+```
+
+
+
+| Paquete      | Responsabilidad           |
+
+| ------------ | ------------------------- |
+
+| `config`     | Configuración de Firebase |
+
+| `controller` | Endpoints de la API REST  |
+
+| `exception`  | Manejo de errores         |
+
+| `model`      | Modelo Producto           |
+
+| `repository` | Acceso a Firestore        |
+
+| `service`    | Lógica de negocio         |
 
 
 
@@ -58,37 +116,13 @@ producto
 
 
 
-\## Estructura principal
-
-
-
-```text
-
-src/main/java/com/ejemplo/productos
-
-├── config
-
-├── controller
-
-├── exception
-
-├── model
-
-├── repository
-
-├── service
-
-└── ProductosApplication.java
-
-```
-
-
-
 \## Requisitos
 
 
 
 \* Java JDK 21.
+
+\* Git.
 
 \* Conexión a Internet.
 
@@ -108,6 +142,10 @@ No es necesario instalar Maven porque el proyecto incluye Maven Wrapper.
 
 
 
+Desde PowerShell:
+
+
+
 ```powershell
 
 git clone https://github.com/andrets13/politecnico-producto.git
@@ -118,17 +156,33 @@ cd ".\\politecnico-producto"
 
 
 
-\## Configurar Firebase
+\## Configurar la credencial de Firebase
 
 
 
-El archivo de credenciales debe ubicarse en:
+El archivo `firebase-productos.json` se entrega por separado.
+
+
+
+Cree la carpeta:
+
+
+
+```powershell
+
+New-Item -ItemType Directory -Force "C:\\credenciales"
+
+```
+
+
+
+Guarde el archivo recibido en:
 
 
 
 ```text
 
-credenciales/firebase-productos.json
+C:\\credenciales\\firebase-productos.json
 
 ```
 
@@ -140,37 +194,27 @@ La estructura debe quedar:
 
 ```text
 
-politecnico-producto
+C:\\credenciales
 
-├── credenciales
-
-│   └── firebase-productos.json
-
-├── src
-
-├── pom.xml
-
-└── README.md
+└── firebase-productos.json
 
 ```
 
 
 
-Desde PowerShell, configure la variable de entorno:
+Configure la variable de entorno:
 
 
 
 ```powershell
 
-$env:GOOGLE\_APPLICATION\_CREDENTIALS = `
-
-(Resolve-Path ".\\credenciales\\firebase-productos.json").Path
+$env:GOOGLE\_APPLICATION\_CREDENTIALS = "C:\\credenciales\\firebase-productos.json"
 
 ```
 
 
 
-Verifique la ruta:
+Verifique la configuración:
 
 
 
@@ -182,7 +226,35 @@ $env:GOOGLE\_APPLICATION\_CREDENTIALS
 
 
 
-\## Ejecutar la aplicación
+\## Ejecutar desde PowerShell
+
+
+
+Ubíquese en el proyecto:
+
+
+
+```powershell
+
+cd "RUTA\\politecnico-producto"
+
+```
+
+
+
+Configure la credencial si todavía no lo ha hecho:
+
+
+
+```powershell
+
+$env:GOOGLE\_APPLICATION\_CREDENTIALS = "C:\\credenciales\\firebase-productos.json"
+
+```
+
+
+
+Ejecute la aplicación:
 
 
 
@@ -194,7 +266,7 @@ $env:GOOGLE\_APPLICATION\_CREDENTIALS
 
 
 
-La aplicación estará lista cuando aparezca:
+La aplicación estará disponible cuando aparezca:
 
 
 
@@ -224,25 +296,47 @@ http://localhost:8080/api/productos
 
 
 
-1\. Seleccione `File > Import`.
+\### Importar el proyecto
 
-2\. Seleccione `Maven > Existing Maven Projects`.
 
-3\. Seleccione la carpeta del proyecto.
 
-4\. Presione `Finish`.
+1\. Abra Eclipse.
 
-5\. Clic derecho sobre el proyecto.
+2\. Seleccione `File > Import`.
 
-6\. Seleccione `Maven > Update Project`.
+3\. Seleccione `Maven > Existing Maven Projects`.
 
-7\. Abra `Run > Run Configurations`.
+4\. Seleccione la carpeta `politecnico-producto`.
 
-8\. Seleccione `Spring Boot App`.
+5\. Presione `Finish`.
 
-9\. Abra la pestaña `Environment`.
+6\. Espere la descarga de las dependencias.
 
-10\. Agregue:
+7\. Clic derecho sobre el proyecto.
+
+8\. Seleccione `Maven > Update Project`.
+
+9\. Marque `Force Update of Snapshots/Releases`.
+
+10\. Presione `OK`.
+
+
+
+\### Configurar la credencial
+
+
+
+1\. Seleccione `Run > Run Configurations`.
+
+2\. Abra `Spring Boot App`.
+
+3\. Seleccione el proyecto.
+
+4\. Abra la pestaña `Environment`.
+
+5\. Presione `Add`.
+
+6\. Configure:
 
 
 
@@ -260,13 +354,39 @@ GOOGLE\_APPLICATION\_CREDENTIALS
 
 Value:
 
-RUTA\_COMPLETA\\credenciales\\firebase-productos.json
+C:\\credenciales\\firebase-productos.json
 
 ```
 
 
 
-11\. Presione `Apply > Run`.
+7\. Presione `Apply`.
+
+8\. Presione `Run`.
+
+
+
+También puede ejecutar la clase:
+
+
+
+```text
+
+com.ejemplo.productos.ProductosApplication
+
+```
+
+
+
+mediante:
+
+
+
+```text
+
+Run As > Spring Boot App
+
+```
 
 
 
@@ -274,27 +394,27 @@ RUTA\_COMPLETA\\credenciales\\firebase-productos.json
 
 
 
-| Método | Endpoint              | Operación           |
+| Método | Endpoint              | Operación           | Código esperado  |
 
-| ------ | --------------------- | ------------------- |
+| ------ | --------------------- | ------------------- | ---------------- |
 
-| GET    | `/api/productos`      | Listar productos    |
+| GET    | `/api/productos`      | Listar productos    | `200 OK`         |
 
-| GET    | `/api/productos/{id}` | Consultar por ID    |
+| GET    | `/api/productos/{id}` | Consultar por ID    | `200 OK`         |
 
-| POST   | `/api/productos`      | Crear producto      |
+| POST   | `/api/productos`      | Crear producto      | `201 Created`    |
 
-| PUT    | `/api/productos/{id}` | Actualizar producto |
+| PUT    | `/api/productos/{id}` | Actualizar producto | `200 OK`         |
 
-| DELETE | `/api/productos/{id}` | Eliminar producto   |
-
-
-
-\## Pruebas en Postman
+| DELETE | `/api/productos/{id}` | Eliminar producto   | `204 No Content` |
 
 
 
-\### Listar
+\## Pruebas con Postman
+
+
+
+\### Listar productos
 
 
 
@@ -306,19 +426,19 @@ GET http://localhost:8080/api/productos
 
 
 
-Respuesta esperada:
+\### Consultar por ID
 
 
 
-```text
+```http
 
-200 OK
+GET http://localhost:8080/api/productos/ID\_DEL\_PRODUCTO
 
 ```
 
 
 
-\### Crear
+\### Crear producto
 
 
 
@@ -348,31 +468,7 @@ Content-Type: application/json
 
 
 
-Respuesta esperada:
-
-
-
-```text
-
-201 Created
-
-```
-
-
-
-\### Consultar por ID
-
-
-
-```http
-
-GET http://localhost:8080/api/productos/ID\_DEL\_PRODUCTO
-
-```
-
-
-
-\### Actualizar
+\### Actualizar producto
 
 
 
@@ -402,19 +498,7 @@ Content-Type: application/json
 
 
 
-Respuesta esperada:
-
-
-
-```text
-
-200 OK
-
-```
-
-
-
-\### Eliminar
+\### Eliminar producto
 
 
 
@@ -426,7 +510,7 @@ DELETE http://localhost:8080/api/productos/ID\_DEL\_PRODUCTO
 
 
 
-Respuesta esperada:
+La respuesta esperada es:
 
 
 
@@ -438,6 +522,10 @@ Respuesta esperada:
 
 
 
+Es normal que la respuesta no tenga contenido.
+
+
+
 \## Validaciones
 
 
@@ -446,7 +534,41 @@ Respuesta esperada:
 
 \* `descripcion` es obligatoria.
 
-\* `precio` es obligatorio y debe ser mayor que cero.
+\* `precio` es obligatorio.
+
+\* `precio` debe ser mayor que cero.
+
+
+
+Ejemplo inválido:
+
+
+
+```json
+
+{
+
+&#x20; "nombre": "",
+
+&#x20; "descripcion": "",
+
+&#x20; "precio": 0
+
+}
+
+```
+
+
+
+Respuesta esperada:
+
+
+
+```text
+
+400 Bad Request
+
+```
 
 
 
@@ -470,21 +592,55 @@ Your default credentials were not found
 
 
 
-Configure nuevamente:
+Ejecute:
 
 
 
 ```powershell
 
-$env:GOOGLE\_APPLICATION\_CREDENTIALS = `
-
-(Resolve-Path ".\\credenciales\\firebase-productos.json").Path
+$env:GOOGLE\_APPLICATION\_CREDENTIALS = "C:\\credenciales\\firebase-productos.json"
 
 ```
 
 
 
-\### El GET devuelve `\[]`
+Compruebe también que el archivo exista:
+
+
+
+```powershell
+
+Test-Path "C:\\credenciales\\firebase-productos.json"
+
+```
+
+
+
+El resultado debe ser:
+
+
+
+```text
+
+True
+
+```
+
+
+
+\### El GET devuelve una lista vacía
+
+
+
+Si la respuesta es:
+
+
+
+```json
+
+\[]
+
+```
 
 
 
@@ -492,13 +648,43 @@ Verifique:
 
 
 
-\* Que la colección se llame `producto`.
+\* Que la credencial pertenezca al proyecto correcto.
+
+\* Que la colección se llame exactamente `producto`.
 
 \* Que existan documentos en Firestore.
 
-\* Que la credencial corresponda al proyecto correcto.
-
 \* Que los campos se llamen `nombre`, `descripcion` y `precio`.
+
+
+
+\### Puerto 8080 ocupado
+
+
+
+Ejecute temporalmente en otro puerto:
+
+
+
+```powershell
+
+.\\mvnw.cmd spring-boot:run `
+
+"-Dspring-boot.run.arguments=--server.port=8081"
+
+```
+
+
+
+Nueva URL:
+
+
+
+```text
+
+http://localhost:8081/api/productos
+
+```
 
 
 
@@ -515,6 +701,10 @@ En PowerShell:
 Ctrl + C
 
 ```
+
+
+
+En Eclipse presione el botón rojo `Terminate`.
 
 
 
@@ -539,6 +729,10 @@ https://github.com/andrets13/politecnico-producto
 andrets13
 
 ```
+
+
+
+Proyecto desarrollado como actividad académica para implementar servicios RESTful y operaciones CRUD utilizando un framework backend y una base de datos en la nube.
 
 
 
