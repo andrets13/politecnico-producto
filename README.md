@@ -1,3 +1,5 @@
+25/08/2026
+
 # CRUD de Productos con Spring Boot y SQL Server
 
 API REST para administrar productos mediante operaciones CRUD. La persistencia se realiza en SQL Server utilizando Spring Data JPA e Hibernate como ORM.
